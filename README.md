@@ -8,6 +8,10 @@
 ## 🌟 Key Features
 
 ### 1. Comprehensive India-Wide Destination Coverage
+
+<img width="1906" height="891" alt="Screenshot 2026-11-15 192311" src="https://github.com/user-attachments/assets/f24b35d6-93a0-4139-a47d-f15dcae0597e" />
+
+
 - **20+ Curated Indian Destinations**: Goa, Kerala, Chennai, Ooty, Coorg, Bengaluru, Hyderabad, Mumbai, Delhi, Jaipur, Udaipur, Agra, Varanasi, Manali, Kashmir, Andaman & Nicobar, Mysuru, Puducherry, Rishikesh, and Darjeeling.
 - **Deep Destination Dashboards**: Cultural epithets, historical rulers & dynasties, best seasons (peak & off-season), crowd levels, live demo temperatures, 4-day forecasts, and peak hour timelines.
 - **High-Resolution Photography**: Hero visual showcases and photo galleries with built-in Lightbox viewer.
@@ -18,10 +22,16 @@
 - **Itemized Budget Breakdown**: Transparent expense calculator for Stays, Food, Transportation, Activities, Shopping, and Emergency buffer with low-budget advisory notices.
 - **1-Click Save**: Store generated itineraries directly to *My Trips*.
 
+<img width="1912" height="898" alt="Screenshot 2026-11-15 192351" src="https://github.com/user-attachments/assets/8d453502-d911-41c5-99e5-5a5315d02bf2" />
+
+
 ### 3. Hotels & Heritage Stays Discovery
 - **Flipkart/Amazon-Style Filter Sidebar**: Filter by Budget range (< ₹2.5k, ₹2.5k–₹5k, ₹5k–₹10k, ₹10k+), Guest Rating (4+, 4.5+, 4.8+), Property Type (Luxury, Resort, Hotel, Homestay, Hostel), Brand (Taj, Marriott/ITC, Heritage Haven, Zostel), and Amenities (Pool, Breakfast, Wi-Fi, Gym, Spa, AC).
 - **Interactive Booking Checkout**: Select room categories (Deluxe, Suite, Villa), choose check-in/out dates, guest counts, and receive an instant demo booking receipt with a unique Booking Code.
 - **Direct Hotel Contact**: Simulated front-desk calling, emailing, and inquiry message dispatch.
+
+<img width="1906" height="900" alt="Screenshot 2026-11-15 192530" src="https://github.com/user-attachments/assets/cb452538-dc97-4117-b216-b87e3b65322e" />
+
 
 ### 4. Monuments & Sightseeing Directory
 - Detailed attraction cards covering opening/closing hours, entry ticket costs (domestic vs foreigner), peak visitor windows, and recommended stay duration.
