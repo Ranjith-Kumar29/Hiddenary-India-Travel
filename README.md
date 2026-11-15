@@ -41,23 +41,24 @@
 - Destination-specific culinary guides (Goan Fish Curry & Bebinca, Chennai Filter Kaapi & Ghee Podi Idli, Kerala Sadya & Appam, Mumbai Vada Pav, Hyderabadi Dum Biryani, Rajasthani Dal Baati Churma).
 - Approximate pricing, dietary tags (Pure Veg 🟢 / Non-Veg 🔴), and legendary eateries where each dish is celebrated.
 
-### 6. Secret Hidden Gems
-- Uncrowded, off-the-beaten-path locations (Chorao Island mangroves, Marari fishing cove, Chand Baori stepwell, Pulicat Lake flamingos, Malana ancient village).
-- Tagged with *"Not a tourist hotspot"* badges, trekking difficulty, and estimated excursion budgets.
 
-### 7. Mini Social Travel Feed & "For You" Recommendations
+### 6. Mini Social Travel Feed & "For You" Recommendations
 - Social feed with traveler photos, captions, destination tags, likes, and comment threads.
 - In-app **"+ Share Travel Memory"** modal to publish custom travel snapshots.
 - Algorithmic *"For You"* section recommending destinations and stays based on saved favorites.
 
 <img width="1901" height="897" alt="Screenshot 2026-11-15 194020" src="https://github.com/user-attachments/assets/692f450b-8a18-471f-a17f-e4885c9dea6e" />
 
+### 7. Secret Hidden Gems
+- Uncrowded, off-the-beaten-path locations (Chorao Island mangroves, Marari fishing cove, Chand Baori stepwell, Pulicat Lake flamingos, Malana ancient village).
+- Tagged with *"Not a tourist hotspot"* badges, trekking difficulty, and estimated excursion budgets.
 
 ### 8. Multilingual Architecture (i18n)
 - Language selector supporting 14 languages: **English**, **Tamil (தமிழ்)**, **Hindi (हिन्दी)**, Telugu, Malayalam, Kannada, Tulu, Urdu, Sanskrit, French, German, Japanese, Korean, and Mandarin.
 - Core UI strings fully translated into English, Tamil, and Hindi with fallback mechanisms.
 
-<img width="1906" height="907" alt="image" src="https://github.com/user-attachments/assets/7308abca-c67c-44c5-b1c5-19caa0f70ec8" />
+<img width="1902" height="895" alt="Screenshot 2026-11-15 193641" src="https://github.com/user-attachments/assets/ea27bdbb-c9df-44a6-96f7-3785e646764a" />
+
 
 
 ### 9. Saved & Offline Experience
