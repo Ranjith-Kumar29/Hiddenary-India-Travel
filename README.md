@@ -50,9 +50,15 @@
 - In-app **"+ Share Travel Memory"** modal to publish custom travel snapshots.
 - Algorithmic *"For You"* section recommending destinations and stays based on saved favorites.
 
+<img width="1901" height="897" alt="Screenshot 2026-11-15 194020" src="https://github.com/user-attachments/assets/692f450b-8a18-471f-a17f-e4885c9dea6e" />
+
+
 ### 8. Multilingual Architecture (i18n)
 - Language selector supporting 14 languages: **English**, **Tamil (தமிழ்)**, **Hindi (हिन्दी)**, Telugu, Malayalam, Kannada, Tulu, Urdu, Sanskrit, French, German, Japanese, Korean, and Mandarin.
 - Core UI strings fully translated into English, Tamil, and Hindi with fallback mechanisms.
+
+<img width="1906" height="907" alt="image" src="https://github.com/user-attachments/assets/7308abca-c67c-44c5-b1c5-19caa0f70ec8" />
+
 
 ### 9. Saved & Offline Experience
 - Universal heart/bookmark save on any destination, hotel, attraction, or blog.
