@@ -1,0 +1,6 @@
+{
+  "name": "Hiddenary - India Travel Portal",
+  "description": "Hiddenary: Discover India, plan custom itineraries, book stays, explore attractions, local food, hidden gems, and travel feed across 20+ Indian destinations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

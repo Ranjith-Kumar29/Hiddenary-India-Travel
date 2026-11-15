@@ -1,0 +1,378 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Private user profile, saved preferences, and favorite item IDs accessible only by the authenticated owner",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Unique identifier for the user matching Firebase Auth UID"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "description": "Display name of the user"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 254,
+          "description": "Verified email address of the user (private PII)"
+        },
+        "avatar": {
+          "type": "string",
+          "maxLength": 1024,
+          "description": "Profile picture URL"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["traveler", "local_guide", "admin"],
+          "description": "Role of the user in the portal"
+        },
+        "preferredLanguage": {
+          "type": "string",
+          "enum": ["en", "ta", "hi", "te", "ml", "kn", "tcy", "ur", "sa", "fr", "de", "ko", "ja", "zh"],
+          "description": "Preferred UI language code"
+        },
+        "bio": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Short bio or tagline about the traveler"
+        },
+        "interests": {
+          "type": "array",
+          "description": "Bounded list (max 20) of selected travel interests"
+        },
+        "savedDestinationIds": {
+          "type": "array",
+          "description": "Bounded list (max 100) of saved destination IDs"
+        },
+        "savedHotelIds": {
+          "type": "array",
+          "description": "Bounded list (max 100) of saved hotel IDs"
+        },
+        "savedAttractionIds": {
+          "type": "array",
+          "description": "Bounded list (max 100) of saved attraction IDs"
+        },
+        "savedBlogIds": {
+          "type": "array",
+          "description": "Bounded list (max 100) of saved blog IDs"
+        },
+        "joinedDate": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Human-readable month/year when the account was created"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when user profile was first created"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of the last profile update"
+        },
+        "lastLoginAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of the latest sign-in"
+        }
+      },
+      "required": ["id", "name", "email", "role", "preferredLanguage", "interests", "joinedDate", "createdAt", "updatedAt", "lastLoginAt"]
+    },
+    "SavedTrip": {
+      "title": "SavedTrip",
+      "description": "Private saved itinerary and travel budget owned by a single user",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "destinationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "destinationName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "daysCount": { "type": "number" },
+        "travelersCount": { "type": "number" },
+        "budgetPerPerson": { "type": "number" },
+        "travelStyle": {
+          "type": "string",
+          "enum": ["Budget", "Standard", "Premium", "Luxury"]
+        },
+        "interests": { "type": "array" },
+        "days": { "type": "array" },
+        "budgetBreakdown": { "type": "object" },
+        "isBudgetSufficient": { "type": "boolean" },
+        "alternativeAdvice": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "createdAtLabel": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "destinationId",
+        "destinationName",
+        "daysCount",
+        "travelersCount",
+        "budgetPerPerson",
+        "travelStyle",
+        "interests",
+        "days",
+        "budgetBreakdown",
+        "isBudgetSufficient",
+        "createdAtLabel",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Booking": {
+      "title": "Booking",
+      "description": "Private hotel booking record owned by a single user",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "bookingCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "hotelId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "hotelName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "destinationName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "roomName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "hotelImage": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "checkInDate": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "checkOutDate": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "nightsCount": { "type": "number" },
+        "guestsCount": { "type": "number" },
+        "baseAmount": { "type": "number" },
+        "taxesAmount": { "type": "number" },
+        "totalAmount": { "type": "number" },
+        "status": {
+          "type": "string",
+          "enum": ["Confirmed", "Completed", "Cancelled"]
+        },
+        "createdAtLabel": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "guestName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "guestEmail": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 254
+        },
+        "guestPhone": {
+          "type": "string",
+          "maxLength": 32
+        }
+      },
+      "required": [
+        "id",
+        "bookingCode",
+        "userId",
+        "hotelId",
+        "hotelName",
+        "destinationName",
+        "roomName",
+        "hotelImage",
+        "checkInDate",
+        "checkOutDate",
+        "nightsCount",
+        "guestsCount",
+        "baseAmount",
+        "taxesAmount",
+        "totalAmount",
+        "status",
+        "createdAtLabel",
+        "createdAt",
+        "updatedAt",
+        "guestName",
+        "guestEmail",
+        "guestPhone"
+      ]
+    },
+    "TravelPost": {
+      "title": "TravelPost",
+      "description": "Public community travel post shared by an authenticated explorer (contains no PII)",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "userName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "userHandle": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "userAvatar": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "destinationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "destinationName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "image": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "caption": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "likesCount": { "type": "number" },
+        "createdAtLabel": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "userName",
+        "userHandle",
+        "userAvatar",
+        "destinationId",
+        "destinationName",
+        "image",
+        "caption",
+        "likesCount",
+        "createdAtLabel",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "User" },
+      "description": "Private user profile, saved favorites, and language/interest preferences accessible strictly by the owning user"
+    },
+    "/users/{userId}/trips/{tripId}": {
+      "schema": { "$ref": "SavedTrip" },
+      "description": "Private saved itineraries and travel budgets owned strictly by the user"
+    },
+    "/users/{userId}/bookings/{bookingId}": {
+      "schema": { "$ref": "Booking" },
+      "description": "Private hotel booking reservations owned strictly by the user"
+    },
+    "/travelPosts/{postId}": {
+      "schema": { "$ref": "TravelPost" },
+      "description": "Public social travel posts shared by verified explorers (strictly non-PII)"
+    }
+  }
+}

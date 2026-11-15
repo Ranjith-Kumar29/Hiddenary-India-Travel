@@ -1,0 +1,349 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. Global Security Primitives
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isVerifiedOwner(userId) {
+      return isEmailVerified() && request.auth.uid == userId;
+    }
+
+    function isValidStringList(listVal, maxItems, maxItemLen) {
+      return listVal is list &&
+        listVal.size() <= maxItems &&
+        (listVal.size() == 0 || (listVal[0] is string && listVal[0].size() <= maxItemLen));
+    }
+
+    // 3. Entity Validation Helpers (No existing() / diff() inside helpers)
+    function isValidUser(data, userId) {
+      return data.keys().hasAll([
+          'id', 'name', 'email', 'role', 'preferredLanguage',
+          'interests', 'joinedDate', 'createdAt', 'updatedAt', 'lastLoginAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'name', 'email', 'avatar', 'role', 'preferredLanguage',
+          'bio', 'interests', 'savedDestinationIds', 'savedHotelIds',
+          'savedAttractionIds', 'savedBlogIds', 'joinedDate',
+          'createdAt', 'updatedAt', 'lastLoginAt'
+        ]) &&
+        data.id is string && data.id == userId && isValidId(data.id) &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 120 &&
+        data.email is string && data.email.size() <= 254 &&
+        (!('avatar' in data) || (data.avatar is string && data.avatar.size() <= 1024)) &&
+        data.role is string && data.role in ['traveler', 'local_guide'] &&
+        data.preferredLanguage is string && data.preferredLanguage in ['en', 'ta', 'hi', 'te', 'ml', 'kn', 'tcy', 'ur', 'sa', 'fr', 'de', 'ko', 'ja', 'zh'] &&
+        (!('bio' in data) || (data.bio is string && data.bio.size() <= 500)) &&
+        isValidStringList(data.interests, 20, 64) &&
+        (!('savedDestinationIds' in data) || isValidStringList(data.savedDestinationIds, 100, 128)) &&
+        (!('savedHotelIds' in data) || isValidStringList(data.savedHotelIds, 100, 128)) &&
+        (!('savedAttractionIds' in data) || isValidStringList(data.savedAttractionIds, 100, 128)) &&
+        (!('savedBlogIds' in data) || isValidStringList(data.savedBlogIds, 100, 128)) &&
+        data.joinedDate is string && data.joinedDate.size() <= 64 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp &&
+        data.lastLoginAt is timestamp;
+    }
+
+    function isValidBudgetBreakdown(b) {
+      return b is map &&
+        b.keys().hasAll([
+          'hotel', 'food', 'transportation', 'activities',
+          'shopping', 'emergencyBuffer', 'totalPerPerson', 'grandTotal'
+        ]) &&
+        b.keys().hasOnly([
+          'hotel', 'food', 'transportation', 'activities',
+          'shopping', 'emergencyBuffer', 'totalPerPerson', 'grandTotal'
+        ]) &&
+        b.hotel is number && b.hotel >= 0 &&
+        b.food is number && b.food >= 0 &&
+        b.transportation is number && b.transportation >= 0 &&
+        b.activities is number && b.activities >= 0 &&
+        b.shopping is number && b.shopping >= 0 &&
+        b.emergencyBuffer is number && b.emergencyBuffer >= 0 &&
+        b.totalPerPerson is number && b.totalPerPerson >= 0 &&
+        b.grandTotal is number && b.grandTotal >= 0;
+    }
+
+    function isValidSavedTrip(data, userId, tripId) {
+      return data.keys().hasAll([
+          'id', 'userId', 'destinationId', 'destinationName', 'daysCount',
+          'travelersCount', 'budgetPerPerson', 'travelStyle', 'interests',
+          'days', 'budgetBreakdown', 'isBudgetSufficient',
+          'createdAtLabel', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'userId', 'destinationId', 'destinationName', 'daysCount',
+          'travelersCount', 'budgetPerPerson', 'travelStyle', 'interests',
+          'days', 'budgetBreakdown', 'isBudgetSufficient', 'alternativeAdvice',
+          'createdAtLabel', 'createdAt', 'updatedAt'
+        ]) &&
+        data.id is string && data.id == tripId && isValidId(data.id) &&
+        data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+        data.destinationId is string && data.destinationId.size() >= 1 && data.destinationId.size() <= 64 &&
+        data.destinationName is string && data.destinationName.size() >= 1 && data.destinationName.size() <= 120 &&
+        data.daysCount is number && data.daysCount >= 1 && data.daysCount <= 30 &&
+        data.travelersCount is number && data.travelersCount >= 1 && data.travelersCount <= 50 &&
+        data.budgetPerPerson is number && data.budgetPerPerson >= 0 && data.budgetPerPerson <= 10000000 &&
+        data.travelStyle is string && data.travelStyle in ['Budget', 'Standard', 'Premium', 'Luxury'] &&
+        isValidStringList(data.interests, 20, 64) &&
+        data.days is list && data.days.size() >= 1 && data.days.size() <= 30 &&
+        isValidBudgetBreakdown(data.budgetBreakdown) &&
+        data.isBudgetSufficient is bool &&
+        (!('alternativeAdvice' in data) || (data.alternativeAdvice is string && data.alternativeAdvice.size() <= 1000)) &&
+        data.createdAtLabel is string && data.createdAtLabel.size() <= 64 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidBooking(data, userId, bookingId) {
+      return data.keys().hasAll([
+          'id', 'bookingCode', 'userId', 'hotelId', 'hotelName',
+          'destinationName', 'roomName', 'hotelImage', 'checkInDate',
+          'checkOutDate', 'nightsCount', 'guestsCount', 'baseAmount',
+          'taxesAmount', 'totalAmount', 'status', 'createdAtLabel',
+          'createdAt', 'updatedAt', 'guestName', 'guestEmail', 'guestPhone'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'bookingCode', 'userId', 'hotelId', 'hotelName',
+          'destinationName', 'roomName', 'hotelImage', 'checkInDate',
+          'checkOutDate', 'nightsCount', 'guestsCount', 'baseAmount',
+          'taxesAmount', 'totalAmount', 'status', 'createdAtLabel',
+          'createdAt', 'updatedAt', 'guestName', 'guestEmail', 'guestPhone'
+        ]) &&
+        data.id is string && data.id == bookingId && isValidId(data.id) &&
+        data.bookingCode is string && data.bookingCode.size() >= 1 && data.bookingCode.size() <= 32 &&
+        data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+        data.hotelId is string && data.hotelId.size() >= 1 && data.hotelId.size() <= 128 &&
+        data.hotelName is string && data.hotelName.size() >= 1 && data.hotelName.size() <= 160 &&
+        data.destinationName is string && data.destinationName.size() >= 1 && data.destinationName.size() <= 120 &&
+        data.roomName is string && data.roomName.size() >= 1 && data.roomName.size() <= 160 &&
+        data.hotelImage is string && data.hotelImage.size() <= 1024 &&
+        data.checkInDate is string && data.checkInDate.size() <= 32 &&
+        data.checkOutDate is string && data.checkOutDate.size() <= 32 &&
+        data.nightsCount is number && data.nightsCount >= 1 && data.nightsCount <= 90 &&
+        data.guestsCount is number && data.guestsCount >= 1 && data.guestsCount <= 20 &&
+        data.baseAmount is number && data.baseAmount >= 0 &&
+        data.taxesAmount is number && data.taxesAmount >= 0 &&
+        data.totalAmount is number && data.totalAmount >= 0 &&
+        data.status is string && data.status in ['Confirmed', 'Completed', 'Cancelled'] &&
+        data.createdAtLabel is string && data.createdAtLabel.size() <= 32 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp &&
+        data.guestName is string && data.guestName.size() >= 1 && data.guestName.size() <= 120 &&
+        data.guestEmail is string && data.guestEmail.size() <= 254 &&
+        data.guestPhone is string && data.guestPhone.size() <= 32;
+    }
+
+    function isValidTravelPost(data, postId) {
+      return data.keys().hasAll([
+          'id', 'userId', 'userName', 'userHandle', 'userAvatar',
+          'destinationId', 'destinationName', 'image', 'caption',
+          'likesCount', 'createdAtLabel', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'userId', 'userName', 'userHandle', 'userAvatar',
+          'destinationId', 'destinationName', 'image', 'caption',
+          'likesCount', 'createdAtLabel', 'createdAt', 'updatedAt'
+        ]) &&
+        data.id is string && data.id == postId && isValidId(data.id) &&
+        data.userId is string && isValidId(data.userId) &&
+        data.userName is string && data.userName.size() >= 1 && data.userName.size() <= 120 &&
+        data.userHandle is string && data.userHandle.size() >= 1 && data.userHandle.size() <= 80 &&
+        data.userAvatar is string && data.userAvatar.size() <= 1024 &&
+        data.destinationId is string && data.destinationId.size() >= 1 && data.destinationId.size() <= 64 &&
+        data.destinationName is string && data.destinationName.size() >= 1 && data.destinationName.size() <= 160 &&
+        data.image is string && data.image.size() >= 1 && data.image.size() <= 1024 &&
+        data.caption is string && data.caption.size() >= 1 && data.caption.size() <= 1000 &&
+        data.likesCount is number && data.likesCount >= 0 &&
+        data.createdAtLabel is string && data.createdAtLabel.size() <= 64 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    // 4. Connection check document
+    match /test/{docId} {
+      allow get: if docId == 'connection';
+    }
+
+    // 5. Private User Profiles & User-Owned Subcollections
+    match /users/{userId} {
+      allow get: if isValidId(userId) && isOwner(userId);
+      allow list: if false;
+
+      allow create: if isVerifiedOwner(userId) &&
+        isValidId(userId) &&
+        isValidUser(incoming(), userId) &&
+        incoming().role == 'traveler' &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        incoming().lastLoginAt == request.time;
+
+      allow update: if isVerifiedOwner(userId) &&
+        isValidId(userId) &&
+        isValidUser(incoming(), userId) &&
+        incoming().id == existing().id &&
+        incoming().role == existing().role &&
+        incoming().joinedDate == existing().joinedDate &&
+        (!('createdAt' in existing()) || incoming().createdAt == existing().createdAt) &&
+        incoming().updatedAt == request.time && (
+          // Action: Session sign-in profile sync
+          (
+            incoming().lastLoginAt == request.time &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'name', 'email', 'avatar', 'preferredLanguage', 'bio',
+              'interests', 'savedDestinationIds', 'savedHotelIds',
+              'savedAttractionIds', 'savedBlogIds', 'createdAt', 'updatedAt', 'lastLoginAt'
+            ])
+          ) ||
+          // Action: Update bio, preferences, or saved favorites
+          (
+            incoming().lastLoginAt == existing().lastLoginAt &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'name', 'avatar', 'preferredLanguage', 'bio',
+              'interests', 'savedDestinationIds', 'savedHotelIds',
+              'savedAttractionIds', 'savedBlogIds', 'updatedAt'
+            ])
+          )
+        );
+
+      allow delete: if isVerifiedOwner(userId) && isValidId(userId);
+
+      // Private Saved Trips & Travel Budgets
+      match /trips/{tripId} {
+        allow get: if isValidId(userId) && isValidId(tripId) && isOwner(userId);
+        allow list: if isOwner(userId) && resource.data.userId == request.auth.uid;
+
+        allow create: if isVerifiedOwner(userId) &&
+          isValidId(userId) &&
+          isValidId(tripId) &&
+          isValidSavedTrip(incoming(), userId, tripId) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          exists(/databases/$(database)/documents/users/$(userId));
+
+        allow update: if isVerifiedOwner(userId) &&
+          isValidId(userId) &&
+          isValidId(tripId) &&
+          isValidSavedTrip(incoming(), userId, tripId) &&
+          incoming().id == existing().id &&
+          incoming().userId == existing().userId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'destinationId', 'destinationName', 'daysCount', 'travelersCount',
+            'budgetPerPerson', 'travelStyle', 'interests', 'days',
+            'budgetBreakdown', 'isBudgetSufficient', 'alternativeAdvice',
+            'createdAtLabel', 'updatedAt'
+          ]) &&
+          exists(/databases/$(database)/documents/users/$(userId));
+
+        allow delete: if isVerifiedOwner(userId) &&
+          isValidId(userId) &&
+          isValidId(tripId) &&
+          exists(/databases/$(database)/documents/users/$(userId));
+      }
+
+      // Private Hotel Bookings
+      match /bookings/{bookingId} {
+        allow get: if isValidId(userId) && isValidId(bookingId) && isOwner(userId);
+        allow list: if isOwner(userId) && resource.data.userId == request.auth.uid;
+
+        allow create: if isVerifiedOwner(userId) &&
+          isValidId(userId) &&
+          isValidId(bookingId) &&
+          isValidBooking(incoming(), userId, bookingId) &&
+          incoming().status == 'Confirmed' &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          exists(/databases/$(database)/documents/users/$(userId));
+
+        allow update: if isVerifiedOwner(userId) &&
+          isValidId(userId) &&
+          isValidId(bookingId) &&
+          isValidBooking(incoming(), userId, bookingId) &&
+          incoming().id == existing().id &&
+          incoming().bookingCode == existing().bookingCode &&
+          incoming().userId == existing().userId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          existing().status == 'Confirmed' &&
+          incoming().status == 'Cancelled' &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']) &&
+          exists(/databases/$(database)/documents/users/$(userId));
+
+        allow delete: if isVerifiedOwner(userId) &&
+          isValidId(userId) &&
+          isValidId(bookingId) &&
+          exists(/databases/$(database)/documents/users/$(userId));
+      }
+    }
+
+    // 6. Community Travel Feed (Strictly Non-PII)
+    match /travelPosts/{postId} {
+      allow get: if isValidId(postId);
+      allow list: if true;
+
+      allow create: if isEmailVerified() &&
+        isValidId(postId) &&
+        isValidTravelPost(incoming(), postId) &&
+        incoming().userId == request.auth.uid &&
+        incoming().likesCount == 1 &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid));
+
+      allow update: if isEmailVerified() &&
+        isValidId(postId) &&
+        isValidTravelPost(incoming(), postId) &&
+        incoming().id == existing().id &&
+        incoming().userId == existing().userId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          // Action: Author edits their own post
+          (
+            existing().userId == request.auth.uid &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'destinationId', 'destinationName', 'image', 'caption', 'updatedAt'
+            ])
+          ) ||
+          // Action: Verified user toggles like count (+/- 1)
+          (
+            incoming().diff(existing()).affectedKeys().hasOnly(['likesCount', 'updatedAt']) &&
+            (incoming().likesCount == existing().likesCount + 1 ||
+             incoming().likesCount == existing().likesCount - 1)
+          )
+        );
+
+      allow delete: if isEmailVerified() &&
+        isValidId(postId) &&
+        existing().userId == request.auth.uid;
+    }
+  }
+}
