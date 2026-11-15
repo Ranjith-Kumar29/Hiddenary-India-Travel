@@ -37,7 +37,11 @@
 - Detailed attraction cards covering opening/closing hours, entry ticket costs (domestic vs foreigner), peak visitor windows, and recommended stay duration.
 - Historical narratives, architectural significance, and nearby restaurants and hotels.
 
-### 5. Regional Food Guides ("Flavours of Bharat")
+### 5. Regional Food Guides ("Flavours of India")
+
+<img width="1896" height="898" alt="Screenshot 2026-11-15 213209" src="https://github.com/user-attachments/assets/cabdb7a9-c7da-46ce-8e0f-6ec4056381b7" />
+
+
 - Destination-specific culinary guides (Goan Fish Curry & Bebinca, Chennai Filter Kaapi & Ghee Podi Idli, Kerala Sadya & Appam, Mumbai Vada Pav, Hyderabadi Dum Biryani, Rajasthani Dal Baati Churma).
 - Approximate pricing, dietary tags (Pure Veg 🟢 / Non-Veg 🔴), and legendary eateries where each dish is celebrated.
 
